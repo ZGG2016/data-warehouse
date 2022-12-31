@@ -1,7 +1,7 @@
 
 来自尚硅谷数仓课程: 
 
-- [hive离线2.0版](https://www.bilibili.com/video/BV1df4y1U79z)
+- [hive离线版2.0](https://www.bilibili.com/video/BV1df4y1U79z)
 - [sparkstreaming实时版](https://www.bilibili.com/video/BV1wZ4y1a7Y6/)
 - [flink实时版](https://www.bilibili.com/video/BV1TG411a7nL/)
 
