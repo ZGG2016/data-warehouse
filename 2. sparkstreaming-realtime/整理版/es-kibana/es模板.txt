@@ -1,0 +1,192 @@
+PUT _template/gmall_dau_info_template
+{
+"index_patterns": ["gmall_dau_info*"],
+"settings": {
+"number_of_shards": 3
+},
+"aliases" : {
+"{index}-query": {},
+"gmall_dau_info_all":{}
+},
+"mappings": {
+"properties":{
+"mid":{
+  "type":"keyword"
+},
+"user_id":{
+"type":"keyword"
+},
+"province_id":{
+"type":"keyword"
+},
+"channel":{
+"type":"keyword"
+},
+"is_new":{
+"type":"keyword"
+},
+"model":{
+"type":"keyword"
+},
+"operate_system":{
+"type":"keyword"
+},
+"version_code":{
+"type":"keyword"
+},
+"page_id":{
+"type":"keyword"
+},
+"page_item":{
+"type":"keyword"
+},
+"page_item_type":{
+"type":"keyword"
+},
+"during_time":{
+"type":"long"
+},
+"user_gender":{
+"type":"keyword"
+},
+"user_age":{
+"type":"integer"
+},
+"province_name":{
+"type":"keyword"
+},
+"province_iso_code":{
+"type":"keyword"
+},
+"province_3166_2":{
+"type":"keyword"
+},
+"province_area_code":{
+"type":"keyword"
+},
+"dt":{
+"type":"keyword"
+},
+"hr":{
+"type":"keyword"
+},
+"ts":{
+"type":"date"
+}
+}
+}
+}
+
+
+PUT _template/gmall_order_wide_template
+{
+"index_patterns": ["gmall_order_wide*"],
+"settings": {
+"number_of_shards": 3,
+"index.max_result_window" :"5000000"
+},
+"aliases" : {
+"{index}-query": {},
+"gmall_order_wide-query":{}
+},
+"mappings" : {
+"properties" : {
+"detail_id" : {
+"type" : "keyword"
+},
+"order_id" : {
+"type" : "keyword"
+},
+"sku_id" : {
+"type" : "keyword"
+},
+"sku_num" : {
+"type" : "long"
+},
+"sku_name" : {
+"type" : "text",
+"analyzer": "ik_max_word"
+},
+"order_price" : {
+"type" : "float"
+},
+"split_total_amount" : {
+"type" : "float"
+},
+"split_activity_amount" : {
+"type" : "float"
+},
+"split_coupon_amount" : {
+"type" : "float"
+},
+"province_id" : {
+"type" : "keyword"
+},
+"order_status" : {
+"type" : "keyword"
+},
+"user_id" : {
+"type" : "keyword"
+},
+"total_amount" : {
+"type" : "float"
+},
+"activity_reduce_amount" : {
+"type" : "float"
+},
+"coupon_reduce_amount" : {
+"type" : "float"
+},
+"original_total_amount" : {
+"type" : "float"
+},
+"feight_fee" : {
+"type" : "float"
+},
+"feight_fee_reduce" : {
+"type" : "float"
+},
+"expire_time" : {
+"type" : "date" ,
+"format" : "yyyy-MM-dd HH:mm:ss"
+},
+"refundable_time" : {
+"type" : "date" ,
+"format" : "yyyy-MM-dd HH:mm:ss"
+},
+"create_time" : {
+"type" : "date" ,
+"format" : "yyyy-MM-dd HH:mm:ss"
+},
+"operate_time" : {
+"type" : "date" ,
+"format" : "yyyy-MM-dd HH:mm:ss"
+},
+"create_date" : {
+"type" : "keyword"
+},
+"create_hour" : {
+"type" : "keyword"
+},
+"province_name" : {
+"type" : "keyword"
+},
+"province_area_code" : {
+"type" : "keyword"
+},
+"province_3166_2_code" : {
+"type" : "keyword"
+},
+"province_iso_code" : {
+"type" : "keyword"
+},
+"user_age" : {
+"type" : "long"
+},
+"user_gender" : {
+"type" : "keyword"
+}
+}
+}
+}
+

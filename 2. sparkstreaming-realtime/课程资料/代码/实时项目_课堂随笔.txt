@@ -1,0 +1,176 @@
+0.gitee仓库地址
+  https://gitee.com/weiyunhui789/spark-realtime-1018.git
+
+1. 前置技术
+   scala(基础语法、函数式编程、集合、模式匹配、异常处理...)
+   SparkStreaming(环境搭建、Kafka数据源、算子)
+   Kafka(生产者(生产、分区策略)  消费者(消费、offset维护、offset重置))
+   Redis(五大数据类型、 Jedis)
+   Maxwell/canal
+   ElasticSearch/Kibana
+   SpringBoot(数据接口)
+
+2. 生成日志数据脚本
+#!/bin/bash
+if [ $# -ge 1 ] 
+then
+sed -i "/mock.date/c mock.date: $1" /opt/module/applog/application.yml
+fi
+cd /opt/module/applog;java -jar gmall2020-mock-log-2021-11-29.jar >/dev/null 2>&1 &
+
+3. kafka脚本
+if [ $# -lt 1 ]
+then 
+   echo "Usage: kf.sh {start|stop|kc [topic]|kp [topic] |list |delete [topic] |describe [topic]}"
+   exit
+fi
+case $1 in 
+start)
+	for i in hadoop102 hadoop103 hadoop104
+	do
+      echo "====================> START $i KF <===================="
+      ssh $i kafka-server-start.sh  -daemon /opt/module/kafka_2.11-2.4.1/config/server.properties 
+	done
+;;
+
+stop)
+	for i in hadoop102 hadoop103 hadoop104
+	do
+      echo "====================> STOP $i KF <===================="
+      ssh $i kafka-server-stop.sh
+	done
+;;
+kc)
+	if [ $2 ]
+	then
+	   kafka-console-consumer.sh --bootstrap-server hadoop102:9092,hadoop103:9092,hadoop104:9092 --topic $2
+	else
+          echo "Usage: kf.sh {start|stop|kc [topic]|kp [topic] |list |delete [topic] |describe [topic]}"
+	fi
+;;
+kp)
+	if [ $2 ]
+	then 
+ 	  kafka-console-producer.sh --broker-list hadoop102:9092,hadoop103:9092,hadoop104:9092 --topic $2
+	else
+	  echo "Usage: kf.sh {start|stop|kc [topic]|kp [topic] |list |delete [topic] |describe [topic]}"
+	fi
+;;
+
+list)
+	kafka-topics.sh --list --bootstrap-server hadoop102:9092,hadoop103:9092,hadoop104:9092
+;;
+describe)
+	if [ $2 ]
+	then
+	 kafka-topics.sh --describe --bootstrap-server hadoop102:9092,hadoop103:9092,hadoop104:9092 --topic $2
+	else
+	 echo "Usage: kf.sh {start|stop|kc [topic]|kp [topic] |list |delete [topic] |describe [topic]}"
+	fi 
+;;
+
+delete)
+	if [ $2 ]
+	then
+	 kafka-topics.sh --delete --bootstrap-server hadoop102:9092,hadoop103:9092,hadoop104:9092 --topic $2
+	else
+	 echo "Usage: kf.sh {start|stop|kc [topic]|kp [topic] |list |delete [topic] |describe [topic]}"
+	fi
+;;
+*)
+   echo "Usage: kf.sh {start|stop|kc [topic]|kp [topic] |list |delete [topic] |describe [topic]}"
+   exit
+;;
+esac
+
+
+4. binlog格式:  statement | row | mixed 
+   
+   statement : 语句级, 只记录写操作的sql语句.
+   			   update xxx set name = zs where id = 1001
+   			   update xxx set name = zs where id > 1001
+   			   update xxx set name = random()/now()/udf() where id = 1001
+
+   row   : 行级，记录每行数据的变化
+           update xxx set name = zs where id = 1001 
+               => 记录 lisi改成了zs
+           update xxx set name = random()/now()/udf() where id = 1001
+               => 记录 lisi改成了random()/now()/udf()的值
+           update xxx set name = zs where id > 1001
+   
+   mixed : statement升级版,正常情况下都是statement,
+   		   只有sql中使用了随机、时间、自定函数等时会变成row
+
+
+
+
+5. 生成业务数据脚本
+#!/bin/bash
+if [ $# -ge 1 ] 
+then
+sed -i "/mock.date/c mock.date: $1" /opt/module/db_log/application.properties
+fi
+cd /opt/module/db_log;java -jar gmall2020-mock-db-2021-01-22.jar >/dev/null 2>&1 &
+
+
+
+
+6. ES启停脚本 es.sh {start | stop}
+#!/bin/bash
+if [ $# -lt 1 ]
+then
+	echo "USAGE: es.sh {start | stop}"
+	exit
+fi
+case $1 in
+start)
+	#es
+	for i in hadoop102 hadoop103 hadoop104
+	do
+		ssh $i nohup /opt/module/es7/bin/elasticsearch >/dev/null 2>&1 &
+	done
+	#kibana
+	ssh hadoop102 nohup /opt/module/kibana7/bin/kibana >/dev/null 2>&1 &
+;;
+
+stop)
+   #kibana
+   ssh hadoop102 "sudo netstat -nltp | grep 5601 | awk '{print \$7}' | awk -F / '{print \$1}' | xargs -n1 kill"
+   #es
+   for i in hadoop102 hadoop103 hadoop104
+   do
+   	 ssh $i "jps | grep Elasticsearch | awk '{print \$1}' | xargs -n1 kill"
+   done
+;;
+
+*)
+	echo "USAGE: es.sh {start | stop}"
+	exit
+;;
+esac
+
+7. Mysql存储 Movie  和 Actor
+
+movie表: 
+ id     name    doubanscore   
+101     战狼        9.0       
+102     八佰        8.8
+103     红海行动    8.9
+
+actor表: 
+id      name    
+1001    吴京     
+1002    张译     
+
+movie_actor表:
+movie_id   actor_id 
+101           1001
+101           1002
+102           1002
+103           1002 
+
+
+
+
+
+
